@@ -1,21 +1,21 @@
         ;; NASM 64-bit
 section .data
 
-msg1:   db "Dla równania kwadratowego o współczynnikach:", 0ah, " a = %.2f, b = %.2f i c = %.2f", 0ah, 0
-msg2:   db "Obliczone pierwiastki to:", 0ah, " x1 = %.2f, x2 = %.2f", 0ah, 0
-msg3:   db "Równanie nie posiada rozwiązań", 0
-msg4:   db "Równanie ma jedno rozwiązanie:", 0ah, " x = %.2f", 0ah, 0
-a:      dq 2.0
-b:      dq 1.0
-c:      dq -2.0
-minusFour: dw -4
+msg1    db "Dla równania kwadratowego o współczynnikach:", 0ah, " a = %.2f, b = %.2f i c = %.2f", 0ah, 0
+msg2    db "Obliczone pierwiastki to:", 0ah, " x1 = %.2f, x2 = %.2f", 0ah, 0
+msg3    db "Równanie nie posiada rozwiązań", 0
+msg4    db "Równanie ma jedno rozwiązanie:", 0ah, " x = %.2f", 0ah, 0
+a       dq 2.0
+b       dq 1.0
+c       dq -2.0
+minus_four dw -4
         
 section .bss
 
-delta_sqrt:     resq 1
-one_over_2a:    resq 1
-x1:             resq 1
-x2:             resq 1
+delta_sqrt      resq 1
+one_over_2a     resq 1
+x1              resq 1
+x2              resq 1
         
 section .text
         global main
@@ -32,7 +32,7 @@ main:                           ; program start
         mov rax, 3              ; 3 xmm registers used
         call printf
 
-        fild word [minusFour]
+        fild word [minus_four]
         fld qword [a]
         fld qword [c]
         fmulp                   ; fstack: ac, -4
