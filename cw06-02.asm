@@ -1,6 +1,7 @@
         ;; NASM 64-bit
 %define EOF     -1
-
+%define stdout	1
+	
 section .data
 
 title   db "Program obliczający pierwiastki równania kwadratowego.", 0
@@ -30,26 +31,7 @@ section .text
         extern puts
         extern printf
 	extern scanf
-	extern getchar
-	extern putchar
 
-flush_stdin:
-	call getchar
-	cmp rax, 0ah
-	jz _flush_stdin_loop_break
-	cmp rax, EOF
-	jz _flush_stdin_loop_break
-	jmp flush_stdin
-_flush_stdin_loop_break:
-	ret
-
-print_nl:
-	push rdi
-	mov rdi, 0ah
-	call putchar
-	pop rdi
-	ret
-	
 main:                           ; program start
         push rbp		; set up stack frame, must be alligned
 	mov rbp, rsp
@@ -64,7 +46,6 @@ main:                           ; program start
 	mov rax, 1
 	call scanf
 	movq qword [a], xmm0
-	call flush_stdin
 
 	mov rdi, enter_b	; printf(give_b)
 	mov rax, 0
@@ -73,7 +54,6 @@ main:                           ; program start
 	mov rax, 1
 	call scanf
 	movq qword [b], xmm0
-	call flush_stdin
 	
 	mov rdi, enter_c	; printf(give_c)
 	mov rax, 0
@@ -82,7 +62,6 @@ main:                           ; program start
 	mov rax, 1
 	call scanf
 	movq qword [c], xmm0
-	call flush_stdin
 	
         mov rdi, msg1
         movq xmm0, qword [a]
