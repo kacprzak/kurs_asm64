@@ -4,11 +4,13 @@
 	
 section .data
 
+zero_double dq 0.0
 title   db "Program obliczający pierwiastki równania kwadratowego.", 0
 msg1    db "Dla równania kwadratowego o współczynnikach:", 0ah, " a = %.2f, b = %.2f i c = %.2f", 0ah, 0
 msg2    db "Obliczone pierwiastki to:", 0ah, " x1 = %.2f, x2 = %.2f", 0ah, 0
 msg3    db "Równanie nie posiada rozwiązań", 0
 msg4    db "Równanie ma jedno rozwiązanie:", 0ah, " x = %.2f", 0ah, 0
+msg5	db "To nie jest równanie kwadratowe!", 0
 enter_a db "Podaj a: ", 0
 enter_b db "Podaj b: ", 0
 enter_c db "Podaj c: ", 0
@@ -43,14 +45,24 @@ main:                           ; program start
 	mov rax, 0
 	call printf
 	mov rdi, format		; scanf
+	mov rsi, a
 	mov rax, 1
 	call scanf
 	movq qword [a], xmm0
 
+	movq xmm1, qword [zero_double]
+	ucomisd xmm0, xmm1
+	jnz a_not_zero
+	mov rdi, msg5
+	call puts
+	jmp main_end
+	
+a_not_zero:	
 	mov rdi, enter_b	; printf(give_b)
 	mov rax, 0
 	call printf
 	mov rdi, format		; scanf
+	mov rsi, b
 	mov rax, 1
 	call scanf
 	movq qword [b], xmm0
@@ -59,6 +71,7 @@ main:                           ; program start
 	mov rax, 0
 	call printf
 	mov rdi, format		; scanf
+	mov rsi, c
 	mov rax, 1
 	call scanf
 	movq qword [c], xmm0
