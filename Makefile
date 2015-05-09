@@ -1,7 +1,7 @@
 CC=gcc
 ASM=nasm
 ASMFLAGS=-f elf64 -g
-PROGS=hello cw06-01 cw06-02 cw06-03 
+PROGS=hello cw06-01 cw06-02 cw06-03 cw06-04 
 
 all: $(PROGS)
 

@@ -4,19 +4,20 @@
 	
 section .data
 
-zero_double dq 0.0
-title   db "Program obliczający pierwiastki równania kwadratowego.", 0
-msg1    db "Dla równania kwadratowego o współczynnikach:", 0ah, " a = %.2f, b = %.2f i c = %.2f", 0ah, 0
-msg2    db "Obliczone pierwiastki to:", 0ah, " x1 = %.2f, x2 = %.2f", 0ah, 0
-msg3    db "Równanie nie posiada rozwiązań", 0
-msg4    db "Równanie ma jedno rozwiązanie:", 0ah, " x = %.2f", 0ah, 0
-msg5	db "To nie jest równanie kwadratowe!", 0
-enter_a db "Podaj a: ", 0
-enter_b db "Podaj b: ", 0
-enter_c db "Podaj c: ", 0
-format  db "%lf", 0
-minus_four dw -4
-        
+zero_double	dq 0.0
+minus_four 	dw -4
+title   	db "Program obliczający pierwiastki równania kwadratowego.", 0
+msg1    	db "Dla równania kwadratowego o współczynnikach:", 0ah, " a = %.2f, b = %.2f i c = %.2f", 0ah, 0
+msg2    	db "Obliczone pierwiastki to:", 0ah, " x1 = %.2f, x2 = %.2f", 0ah, 0
+msg3    	db "Równanie nie posiada rozwiązań", 0
+msg4    	db "Równanie ma jedno rozwiązanie:", 0ah, " x = %.2f", 0ah, 0
+msg5		db "To nie jest równanie kwadratowe!", 0
+line		db "========================================", 0
+format  	db "%lf %lf %lf", 0
+file_open_err   db "Nie udało się otworzyć pliku!", 0
+file_name	db "cw06-04.txt", 0
+file_mode	db "r", 0
+	
 section .bss
 
 a       	resq 1
@@ -26,13 +27,16 @@ delta_sqrt      resq 1
 one_over_2a     resq 1
 x1              resq 1
 x2              resq 1
+fp		resq 1		; FILE *fp
         
 section .text
         global main
         extern exit
         extern puts
         extern printf
-	extern scanf
+	extern fscanf
+	extern fopen
+	extern fclose
 
 main:                           ; program start
         push rbp		; set up stack frame, must be alligned
@@ -40,13 +44,31 @@ main:                           ; program start
 
 	mov rdi, title		; puts(title)
 	call puts
+
+	mov rdi, file_name	; fopen
+	mov rsi, file_mode
+	call fopen
+	mov qword [fp], rax
+	cmp rax, 0
+	jne file_ok
+	mov rdi, file_open_err
+	call puts
+	jmp main_return
+file_ok:	
+while:	
+	mov rdi, qword [fp]	; scanf
+	mov rsi, format
+	mov rdx, a
+	mov rcx, b
+	mov r8, c
+	call fscanf
+
+	cmp rax, 3
+	jne main_end
 	
-	mov rdi, enter_a	; printf(give_a)
-	mov rax, 0
-	call printf
-	mov rdi, format		; scanf
-	mov rsi, a
-	call scanf
+while_body:
+	mov rdi, line
+	call puts
 
 	movq xmm0, qword [a]
 	movq xmm1, qword [zero_double]
@@ -54,23 +76,9 @@ main:                           ; program start
 	jnz a_not_zero
 	mov rdi, msg5
 	call puts
-	jmp main_end
+	jmp while
 	
-a_not_zero:	
-	mov rdi, enter_b	; printf(give_b)
-	mov rax, 0
-	call printf
-	mov rdi, format		; scanf
-	mov rsi, b
-	call scanf
-	
-	mov rdi, enter_c	; printf(give_c)
-	mov rax, 0
-	call printf
-	mov rdi, format		; scanf
-	mov rsi, c
-	call scanf
-	
+a_not_zero:		
         mov rdi, msg1
         movq xmm0, qword [a]
         movq xmm1, qword [b]
@@ -125,7 +133,7 @@ a_not_zero:
         mov rax, 2
         call printf       
         
-        jmp main_end
+        jmp while
 
 main_one_solution:
         mov rdi, msg4
@@ -133,13 +141,16 @@ main_one_solution:
         mov rax, 1
         call printf
         
-        jmp main_end
+        jmp while
         
 main_no_solutions:
         mov rdi, msg3
         call puts
+	jmp while
         
 main_end:
+	mov rdi, qword[fp]
+	call fclose
         xor rax, rax            ; return 0
 
 main_return:	

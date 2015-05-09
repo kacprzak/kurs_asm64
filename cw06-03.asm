@@ -50,10 +50,9 @@ do_repeat:
 	call printf
 	mov rdi, format		; scanf
 	mov rsi, a
-	mov rax, 1
 	call scanf
-	movq qword [a], xmm0
 
+	movq xmm0, qword [a]
 	movq xmm1, qword [zero_double]
 	ucomisd xmm0, xmm1
 	jnz a_not_zero
@@ -67,18 +66,14 @@ a_not_zero:
 	call printf
 	mov rdi, format		; scanf
 	mov rsi, b
-	mov rax, 1
 	call scanf
-	movq qword [b], xmm0
 	
 	mov rdi, enter_c	; printf(give_c)
 	mov rax, 0
 	call printf
 	mov rdi, format		; scanf
 	mov rsi, c
-	mov rax, 1
 	call scanf
-	movq qword [c], xmm0
 	
         mov rdi, msg1
         movq xmm0, qword [a]
@@ -154,7 +149,6 @@ main_end:
 	call printf
 	mov rdi, format_char
 	mov rsi, repeat
-	xor rax, rax
 	call scanf
 	cmp byte [repeat], 't'
 	jz do_repeat
